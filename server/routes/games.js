@@ -19,17 +19,17 @@ const getWinner = board => {
     return board.includes("") ? "" : "draw"
 }
 
-// router.param('id', async (req, res, next, id) => {
-//     const game = mongoose.isValidObjectId(id) && await Game.findById(id)
-//     if (!game) {
-//         return res.status(404).json({message: 'Game not found'})
-//     }
-//     req.game = game
-//     next()
-// })
+router.param('id', async (req, res, next, id) => {
+    const game = mongoose.isValidObjectId(id) && await Game.findById(id)
+    if (!game) {
+        return res.status(404).json({message: 'Game not found'})
+    }
+    req.game = game
+    next()
+})
 
 router.post('/', async (req, res) => {
-    const game = await Game.create()
+    const game = await Game.create({})
     res.status(201).json(game)
 })
 

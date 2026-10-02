@@ -40,10 +40,26 @@ function App() {
     setGameId(newGame._id)
   }
 
+  // action will be wither "move" or "reset"
+  const sendAction = async (action, body = {}) => {
+    const response = await fetch(`/api/games/${gameId}/${action}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    })
+    const data = await response.json()
+    if (response.ok) {
+      setGame(data)
+      setError("")
+    } else {
+      setError(data.message)
+    }
+  }
+
   if (!gameId) {
     return (
       <main>
-        <h1># Tic-Tac-Toe #</h1>
+        <h1>Tic-Tac-Toe</h1>
         <button onClick={createGame}>New game</button>
       </main>
     )
@@ -57,15 +73,37 @@ function App() {
     )
   }
 
+  let status = game.turn === player ? "Your turn." : `Waiting for ${game.turn}...`
+  if (game.winner === "draw") {
+    status = "It's a tie!"
+  } else if (game.winner) {
+    status = `${game.winner} wins!`
+  }
+
   return (
     <main>
-      <h1># Tic-Tac-Toe #</h1>
-      <p>You are <strong>{player}</strong>.</p>
+      <h1>Tic-Tac-Toe</h1>
+      <p>You are <strong>{player}</strong>. {status}</p>
       <div className="board">
         {game.board.map((cell, index) => (
-          <button key={index} className="cell">{cell}</button>
+          <button
+            key={index}
+            className="cell"
+            onClick={() => {
+              sendAction("move", { index, player })
+            }}
+            disabled={cell !== "" || game.winner !== "" || game.turn !== player}
+          >
+            {cell}
+          </button>
         ))}
       </div>
+
+      {error && <p>{error}</p>}
+      {game.winner && <button onClick={() => {sendAction("reset")}}>Play again.</button>}
+
+      <p>Send this link to your opponent:</p>
+      <input readOnly value={window.location} />
     </main>
   )
 }

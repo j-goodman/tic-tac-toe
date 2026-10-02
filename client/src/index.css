@@ -9,8 +9,12 @@ button, input {
   padding: 8px 12px;
 }
 
-button {
+button:not(:disabled) {
   cursor: pointer;
+}
+
+button:not(:disabled):hover {
+  background-color: #cde;
 }
 
 .board {
